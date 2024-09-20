@@ -1,0 +1,80 @@
+# Kubernetes deployment file to deploy book_catalog and inventory_management microservices to aks
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: book-catalog-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: book-catalog
+  template:
+    metadata:
+      labels:
+        app: book-catalog
+    spec:
+      containers:
+      - name: book-catalog
+        image: week7tasksheet.azurecr.io/book1
+        ports:
+        - containerPort: 8001
+        env:
+        - name: DATABASE_URL
+          value: "postgresql://sit722_7_1p_user:RXyIcipEtpuFqzCxSd40AdGkkAfnsUPr@dpg-crmd4ui3esus73fr7b20-a.oregon-postgres.render.com/sit722_7_1p"
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inventory-management-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: inventory-management
+  template:
+    metadata:
+      labels:
+        app: inventory-management
+    spec:
+      containers:
+      - name: inventory-management
+        image: week7tasksheet.azurecr.io/inventory1
+        ports:
+        - containerPort: 8002
+        env:
+        - name: DATABASE_URL
+          value: "postgresql://sit722_7_1p_user:RXyIcipEtpuFqzCxSd40AdGkkAfnsUPr@dpg-crmd4ui3esus73fr7b20-a.oregon-postgres.render.com/sit722_7_1p"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: book-catalog-service
+spec:
+  selector:
+    app: book-catalog
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 8001
+      targetPort: 8001
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: inventory-management-service
+spec:
+  selector:
+    app: inventory-management
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 8002
+      targetPort: 8002
+  
+  
